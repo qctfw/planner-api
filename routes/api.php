@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PlanController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +16,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['prefix' => 'user'], function () {
+    Route::post('login', [UserController::class, 'login']);
+    Route::post('register', [UserController::class, 'register']);
+    Route::get('/', [UserController::class, 'show'])->middleware('auth:sanctum');
+});
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::apiResource('plans', PlanController::class);
+    Route::get('plans/status/{status}', [PlanController::class, 'getByStatus']);
 });
